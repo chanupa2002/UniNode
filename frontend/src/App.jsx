@@ -73,16 +73,14 @@ const SECTIONS = [
   },
   {
     id: "comp-2",
-    label: "Comp 2",
+    label: "My Bookings",
     placement: "quick",
-    title: "Comp 2",
-    description: "Placeholder list for the second future module.",
-    searchPlaceholder: "Search comp 2...",
-    buttonLabel: "Add Item",
+    title: "My Bookings",
+    description: "Placeholder list for the bookings module.",
+    searchPlaceholder: "Search bookings...",
+    buttonLabel: "Bookings",
     items: [
-      { code: "C2", name: "Comp 2 Item 1", description: "First placeholder item for this future screen." },
-      { code: "C2", name: "Comp 2 Item 2", description: "Second placeholder item for this future screen." },
-      { code: "C2", name: "Comp 2 Item 3", description: "Third placeholder item for this future screen." },
+      { code: "BK", name: "My Bookings", description: "Bookings module placeholder." },
     ],
   },
   {
