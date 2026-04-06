@@ -1,5 +1,6 @@
 package com.uninode.smartcampus.modules.facilities.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -114,5 +115,18 @@ public class FacilityCatalogController {
             @Valid @RequestBody DeleteResourceFromSlotRequest request) {
         facilityCatalogService.deleteResourceFromSlot(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/GetDaybyDate")
+    public ResponseEntity<String> getDaybyDate(@RequestParam("date") LocalDate date) {
+        if (date == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Query parameter 'date' is required.");
+        }
+
+        String response = facilityCatalogService.getDayByDate(date);
+        return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.noStore())
+                .body(response);
     }
 }

@@ -1,5 +1,6 @@
 package com.uninode.smartcampus.modules.facilities.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -207,6 +208,11 @@ public class FacilityCatalogService {
                     "No Ds_resource mapping found for slot_id '" + request.slotId()
                             + "' and resource_id '" + request.resourceId() + "'.");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public String getDayByDate(LocalDate date) {
+        return date.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, Locale.ENGLISH);
     }
 
     private List<FacilityCatalogItemResponse> toResponse(List<ResourceEntity> rows) {

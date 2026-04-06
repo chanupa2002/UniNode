@@ -1,6 +1,7 @@
 package com.uninode.smartcampus.modules.booking.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.uninode.smartcampus.modules.booking.dto.PendingBookingResponse;
 import com.uninode.smartcampus.modules.booking.dto.SlotIdResponse;
 import com.uninode.smartcampus.modules.booking.service.BookingSlotService;
 
@@ -61,6 +63,20 @@ public class BookingSlotController {
         }
 
         Boolean response = bookingSlotService.checkDynamicBooking(resourceId, timeslotId, date);
+        return ResponseEntity
+                .ok()
+                .cacheControl(CacheControl.noStore())
+                .body(response);
+    }
+
+    @GetMapping("/ViewPendingBookings")
+    public ResponseEntity<List<PendingBookingResponse>> viewPendingBookings(
+            @RequestParam("created_date") LocalDate createdDate) {
+        if (createdDate == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Query parameter 'created_date' is required.");
+        }
+
+        List<PendingBookingResponse> response = bookingSlotService.viewPendingBookings(createdDate);
         return ResponseEntity
                 .ok()
                 .cacheControl(CacheControl.noStore())
