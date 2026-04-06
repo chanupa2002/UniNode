@@ -5,5 +5,15 @@ public record FacilityCatalogItemResponse(
         String type,
         String name,
         Integer capacity,
-        String location) {
+        String location,
+        Boolean available) {
+
+    public FacilityCatalogItemResponse(
+            Long id,
+            String type,
+            String name,
+            Integer capacity,
+            String location) {
+        this(id, type, name, capacity, location, null);
+    }
 }
