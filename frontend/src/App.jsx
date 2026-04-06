@@ -845,10 +845,6 @@ function ResourcesSection({ token }) {
 
               <div className="resource-card-meta">
                 <div className="resource-meta-item">
-                  <span className="resource-meta-label">Resource ID</span>
-                  <strong>{resource.id ?? "--"}</strong>
-                </div>
-                <div className="resource-meta-item">
                   <span className="resource-meta-label">Capacity</span>
                   <strong>{resource.capacity ?? "N/A"}</strong>
                 </div>
