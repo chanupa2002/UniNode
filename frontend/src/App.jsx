@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import BookByNamePanel from "./components/booking/BookByNamePanel";
+import BookByTypePanel from "./components/booking/BookByTypePanel";
+import PendingBookingsPanel from "./components/booking/PendingBookingsPanel";
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
 const SESSION_KEY = "smart-campus.session";
@@ -642,8 +645,8 @@ function DashboardPage({ activeSection, onLogout, onSectionChange, onThemeToggle
               }`}
             >
               {shouldShowResources ? <ResourcesSection token={token} /> : null}
-              {shouldShowMyBookings ? <MyBookingsSection /> : null}
-              {shouldShowBookResource ? <BookResourceSection /> : null}
+              {shouldShowMyBookings ? <MyBookingsSection token={token} user={user} /> : null}
+              {shouldShowBookResource ? <BookResourceSection token={token} user={user} /> : null}
               {shouldShowMyTickets ? <MyTicketsSection /> : null}
             </section>
           </div>
@@ -865,11 +868,11 @@ function ResourcesSection({ token }) {
   );
 }
 
-function MyBookingsSection() {
+function MyBookingsSection({ token, user }) {
   const [activeTab, setActiveTab] = useState("approved");
   const activePanel = {
     approved: <ApprovedBookingsPanel />,
-    pending: <PendingBookingsPanel />,
+    pending: <PendingBookingsPanel apiBaseUrl={API_BASE_URL} token={token} userId={user?.userId} />,
     rejected: <RejectedBookingsPanel />,
     cancelled: <CancelledBookingsPanel />,
   }[activeTab];
@@ -922,9 +925,14 @@ function MyBookingsSection() {
   );
 }
 
-function BookResourceSection() {
+function BookResourceSection({ token, user }) {
   const [activeTab, setActiveTab] = useState("type");
-  const activePanel = activeTab === "type" ? <BookByTypePanel /> : <BookByNamePanel />;
+  const activePanel =
+    activeTab === "type" ? (
+      <BookByTypePanel apiBaseUrl={API_BASE_URL} roleName={user?.roleName} token={token} userId={user?.userId} />
+    ) : (
+      <BookByNamePanel apiBaseUrl={API_BASE_URL} token={token} userId={user?.userId} />
+    );
 
   return (
     <div className="book-resource-shell">
@@ -999,15 +1007,6 @@ function ApprovedBookingsPanel() {
   );
 }
 
-function PendingBookingsPanel() {
-  return (
-    <div className="book-resource-panel-card">
-      <h3>Pending Bookings</h3>
-      <p>Pending bookings display here. We can add the real pending booking content next.</p>
-    </div>
-  );
-}
-
 function RejectedBookingsPanel() {
   return (
     <div className="book-resource-panel-card">
@@ -1040,24 +1039,6 @@ function SolvedTicketsPanel() {
     <div className="book-resource-panel-card">
       <h3>Solved Tickets</h3>
       <p>Solved tickets display here. We can add the real solved ticket content next.</p>
-    </div>
-  );
-}
-
-function BookByTypePanel() {
-  return (
-    <div className="book-resource-panel-card">
-      <h3>Book by Type</h3>
-      <p>This is the Book by Type section. We can add the real booking flow here next.</p>
-    </div>
-  );
-}
-
-function BookByNamePanel() {
-  return (
-    <div className="book-resource-panel-card">
-      <h3>Book by Name</h3>
-      <p>This is the Book by Name section. We can add the real booking flow here next.</p>
     </div>
   );
 }
