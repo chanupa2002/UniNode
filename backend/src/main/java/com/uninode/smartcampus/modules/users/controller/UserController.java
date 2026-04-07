@@ -6,6 +6,7 @@ import com.uninode.smartcampus.modules.users.dto.AuthResponse;
 import com.uninode.smartcampus.modules.users.dto.OAuthUpdateRequest;
 import com.uninode.smartcampus.modules.users.dto.UpdateUserRequest;
 import com.uninode.smartcampus.modules.users.dto.UserResponse;
+import com.uninode.smartcampus.modules.users.dto.UserTypeResponse;
 import com.uninode.smartcampus.modules.users.entity.User;
 import com.uninode.smartcampus.modules.users.service.UserService;
 import jakarta.validation.Valid;
@@ -38,6 +39,11 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/{id}/type")
+    public ResponseEntity<UserTypeResponse> getUserTypeByUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserTypeByUserId(id));
     }
 
     @PutMapping("/oAuthUpdate/{id}")

@@ -8,6 +8,7 @@ import com.uninode.smartcampus.modules.users.dto.OAuthUpdateRequest;
 import com.uninode.smartcampus.modules.users.dto.RegisterRequest;
 import com.uninode.smartcampus.modules.users.dto.UpdateUserRequest;
 import com.uninode.smartcampus.modules.users.dto.UserResponse;
+import com.uninode.smartcampus.modules.users.dto.UserTypeResponse;
 
 public interface UserService {
 
@@ -20,6 +21,8 @@ public interface UserService {
     AuthResponse oAuthUpdate(Long id, OAuthUpdateRequest request);
 
     UserResponse getUserById(Long id);
+
+    UserTypeResponse getUserTypeByUserId(Long id);
 
     List<UserResponse> getAllUsers();
 

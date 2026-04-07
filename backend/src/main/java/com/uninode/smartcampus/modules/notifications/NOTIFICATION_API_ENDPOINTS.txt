@@ -1,0 +1,146 @@
+UniNode Notification API Endpoints
+Location: /api/notifications
+Suggested base URL: http://localhost:8080
+Database table used: Notifications
+
+Common headers
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+Allowed notification types
+Ticket
+System
+Booking
+
+1. Create Notification
+Method: POST
+URL: http://localhost:8080/api/notifications
+Auth required: Yes
+DB action: Inserts a new row into Notifications
+
+Sample body
+{
+  "userId": 1,
+  "notificationType": "Ticket",
+  "notification": "Your support ticket #145 has been assigned to an agent."
+}
+
+Sample success response
+{
+  "notificationId": 101,
+  "createdAt": "2026-04-07T21:30:00+05:30",
+  "notificationType": "Ticket",
+  "notification": "Your support ticket #145 has been assigned to an agent.",
+  "userId": 1
+}
+
+2. Delete Notification
+Method: DELETE
+URL: http://localhost:8080/api/notifications/{notificationId}
+Example: http://localhost:8080/api/notifications/101
+Auth required: Yes
+DB action: Deletes the matching row from Notifications
+
+Sample success response
+HTTP 204 No Content
+
+3. View All Notifications For A Single User
+Method: GET
+URL: http://localhost:8080/api/notifications/users/{userId}
+Example: http://localhost:8080/api/notifications/users/1
+Auth required: Yes
+Order: LIFO (newest first)
+DB source: Reads rows from Notifications for the given user_id
+
+Sample success response
+[
+  {
+    "notificationId": 105,
+    "createdAt": "2026-04-07T22:10:00+05:30",
+    "notificationType": "System",
+    "notification": "System maintenance is scheduled for tonight at 11:30 PM.",
+    "userId": 1
+  },
+  {
+    "notificationId": 103,
+    "createdAt": "2026-04-07T21:50:00+05:30",
+    "notificationType": "Booking",
+    "notification": "Your lab booking for Room A-201 has been confirmed.",
+    "userId": 1
+  },
+  {
+    "notificationId": 101,
+    "createdAt": "2026-04-07T21:30:00+05:30",
+    "notificationType": "Ticket",
+    "notification": "Your support ticket #145 has been assigned to an agent.",
+    "userId": 1
+  }
+]
+
+4. View Notifications For A Single User By Notification Type
+Method: GET
+URL: http://localhost:8080/api/notifications/users/{userId}/types/{notificationType}
+Example 1: http://localhost:8080/api/notifications/users/1/types/Ticket
+Example 2: http://localhost:8080/api/notifications/users/1/types/System
+Example 3: http://localhost:8080/api/notifications/users/1/types/Booking
+Auth required: Yes
+Order: LIFO (newest first)
+DB source: Reads rows from Notifications filtered by user_id and notification_type
+
+Sample success response
+[
+  {
+    "notificationId": 110,
+    "createdAt": "2026-04-07T22:40:00+05:30",
+    "notificationType": "Ticket",
+    "notification": "Your support ticket #145 has been resolved.",
+    "userId": 1
+  },
+  {
+    "notificationId": 101,
+    "createdAt": "2026-04-07T21:30:00+05:30",
+    "notificationType": "Ticket",
+    "notification": "Your support ticket #145 has been assigned to an agent.",
+    "userId": 1
+  }
+]
+
+Sample error response for invalid notification type
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Notification type must be one of: Ticket, System, Booking",
+  "timestamp": "2026-04-07T22:45:00"
+}
+
+Sample error response for missing user
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "User not found with id: 999",
+  "timestamp": "2026-04-07T22:46:00"
+}
+
+Sample error response for missing notification
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Notification not found with id: 999",
+  "timestamp": "2026-04-07T22:47:00"
+}
+
+Postman notes
+1. Login first and copy the JWT token from the login response.
+2. Add the token under Authorization as Bearer Token, or use:
+Authorization: Bearer <your_jwt_token>
+3. Replace sample IDs with real IDs from your database.
+4. Notification type is case-insensitive in the backend, but for testing use:
+Ticket
+System
+Booking
+5. Table columns used by the backend:
+notification_id
+created_at
+notification_type
+notification
+user_id

@@ -11,6 +11,7 @@ import com.uninode.smartcampus.modules.users.dto.OAuthUpdateRequest;
 import com.uninode.smartcampus.modules.users.dto.RegisterRequest;
 import com.uninode.smartcampus.modules.users.dto.UpdateUserRequest;
 import com.uninode.smartcampus.modules.users.dto.UserResponse;
+import com.uninode.smartcampus.modules.users.dto.UserTypeResponse;
 import com.uninode.smartcampus.modules.users.entity.User;
 import com.uninode.smartcampus.modules.users.entity.UserType;
 import com.uninode.smartcampus.modules.users.exception.DuplicateUserException;
@@ -148,6 +149,19 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
         return toUserResponse(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserTypeResponse getUserTypeByUserId(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+        return UserTypeResponse.builder()
+                .userId(user.getUserId())
+                .userTypeId(user.getUserType() != null ? user.getUserType().getUsertypeId() : null)
+                .roleName(user.getUserType() != null ? user.getUserType().getRoleName() : null)
+                .build();
     }
 
     @Override

@@ -1,0 +1,209 @@
+UniNode User API Endpoints
+Location: /api
+Suggested base URL: http://localhost:8080
+
+Common headers
+Content-Type: application/json
+Authorization: Bearer <your_jwt_token>
+
+1. Register User
+Method: POST
+URL: http://localhost:8080/api/auth/register
+Auth required: No
+
+Sample body
+{
+  "name": "John Silva",
+  "username": "john_silva",
+  "email": "john.silva@example.com",
+  "password": "Password123",
+  "phone": "0771234567",
+  "address": "123 Main Street, Colombo",
+  "roleName": "Student"
+}
+
+Sample success response
+{
+  "userId": 1,
+  "name": "John Silva",
+  "username": "john_silva",
+  "email": "john.silva@example.com",
+  "phone": "0771234567",
+  "address": "123 Main Street, Colombo",
+  "roleName": "Student",
+  "active": true,
+  "createdAt": "2026-04-07T21:00:00"
+}
+
+2. Login
+Method: POST
+URL: http://localhost:8080/api/auth/login
+Auth required: No
+
+Sample body
+{
+  "email": "john.silva@example.com",
+  "password": "Password123"
+}
+
+Sample success response
+{
+  "token": "<jwt_token_here>",
+  "user": {
+    "userId": 1,
+    "name": "John Silva",
+    "username": "john_silva",
+    "email": "john.silva@example.com",
+    "phone": "0771234567",
+    "address": "123 Main Street, Colombo",
+    "roleName": "Student",
+    "active": true,
+    "createdAt": "2026-04-07T21:00:00"
+  }
+}
+
+3. Get All Users
+Method: GET
+URL: http://localhost:8080/api/users
+Auth required: Yes
+Who can access: Admin only
+
+Sample success response
+[
+  {
+    "userId": 1,
+    "name": "John Silva",
+    "username": "john_silva",
+    "email": "john.silva@example.com",
+    "phone": "0771234567",
+    "address": "123 Main Street, Colombo",
+    "roleName": "Student",
+    "active": true,
+    "createdAt": "2026-04-07T21:00:00"
+  },
+  {
+    "userId": 2,
+    "name": "Admin User",
+    "username": "admin_user",
+    "email": "admin@example.com",
+    "phone": "0712345678",
+    "address": "Admin Office",
+    "roleName": "Admin",
+    "active": true,
+    "createdAt": "2026-04-07T21:05:00"
+  }
+]
+
+4. Get User By ID
+Method: GET
+URL: http://localhost:8080/api/users/{id}
+Example: http://localhost:8080/api/users/1
+Auth required: Yes
+
+Sample success response
+{
+  "userId": 1,
+  "name": "John Silva",
+  "username": "john_silva",
+  "email": "john.silva@example.com",
+  "phone": "0771234567",
+  "address": "123 Main Street, Colombo",
+  "roleName": "Student",
+  "active": true,
+  "createdAt": "2026-04-07T21:00:00"
+}
+
+5. Get User Type By User ID
+Method: GET
+URL: http://localhost:8080/api/users/{id}/type
+Example: http://localhost:8080/api/users/1/type
+Auth required: Yes
+
+Sample success response
+{
+  "userId": 1,
+  "userTypeId": 1,
+  "roleName": "Student"
+}
+
+6. Update User
+Method: PUT
+URL: http://localhost:8080/api/users/{id}
+Example: http://localhost:8080/api/users/1
+Auth required: Yes
+
+Sample body
+{
+  "name": "John Silva Updated",
+  "phone": "0777654321",
+  "address": "45 Lake Road, Colombo",
+  "username": "john_silva_updated",
+  "roleName": "Lecturer"
+}
+
+Sample success response
+{
+  "userId": 1,
+  "name": "John Silva Updated",
+  "username": "john_silva_updated",
+  "email": "john.silva@example.com",
+  "phone": "0777654321",
+  "address": "45 Lake Road, Colombo",
+  "roleName": "Lecturer",
+  "active": true,
+  "createdAt": "2026-04-07T21:00:00"
+}
+
+7. OAuth Update User
+Method: PUT
+URL: http://localhost:8080/api/users/oAuthUpdate/{id}
+Example: http://localhost:8080/api/users/oAuthUpdate/1
+Auth required: Yes
+Who can access: Same user or Admin
+
+Sample body
+{
+  "name": "OAuth User Updated",
+  "phone": "0770001112",
+  "address": "78 Temple Road, Kandy",
+  "roleName": "Student"
+}
+
+Sample success response
+{
+  "token": "<new_jwt_token_here>",
+  "user": {
+    "userId": 1,
+    "name": "OAuth User Updated",
+    "username": "oauth_user",
+    "email": "oauth.user@example.com",
+    "phone": "0770001112",
+    "address": "78 Temple Road, Kandy",
+    "roleName": "Student",
+    "active": true,
+    "createdAt": "2026-04-07T21:10:00"
+  }
+}
+
+8. Delete User
+Method: DELETE
+URL: http://localhost:8080/api/users/{id}
+Example: http://localhost:8080/api/users/1
+Auth required: Yes
+Who can access: Admin only
+Note: This is a soft delete. It sets active = false.
+
+Sample success response
+HTTP 204 No Content
+
+Postman notes
+1. Login first and copy the token from the response.
+2. Add the token under Authorization as Bearer Token, or use:
+Authorization: Bearer <your_jwt_token>
+3. Replace sample IDs with real user IDs from your database.
+4. Allowed roleName values:
+Student
+Lecturer
+Instructor
+Technician
+Admin
