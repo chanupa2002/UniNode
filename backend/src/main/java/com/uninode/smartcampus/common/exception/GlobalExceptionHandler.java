@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.uninode.smartcampus.modules.notifications.exception.NotificationNotFoundException;
 import com.uninode.smartcampus.modules.users.exception.DuplicateUserException;
 import com.uninode.smartcampus.modules.users.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.validation.FieldError;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,6 +24,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException exception) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Not Found", exception.getMessage());
+    }
+
+    @ExceptionHandler(NotificationNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotificationNotFound(NotificationNotFoundException exception) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Not Found", exception.getMessage());
     }
 
@@ -53,6 +61,16 @@ public class GlobalExceptionHandler {
                 .toList();
 
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", fieldErrors);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException exception) {
+        List<String> violations = exception.getConstraintViolations()
+                .stream()
+                .map(violation -> violation.getMessage())
+                .toList();
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", violations);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
