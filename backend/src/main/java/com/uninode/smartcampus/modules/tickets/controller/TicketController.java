@@ -184,10 +184,30 @@ public class TicketController {
             @PathVariable Long id,
             @Valid @RequestBody UpdateTicketStatusRequest request,
             Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        boolean isAdmin = user.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        TicketResponse response = ticketService.updateTicketStatus(id, request, user.getUserId(), isAdmin);
+        Long currentUserId = resolveUserId(authentication);
+
+        // Prefer persisted role when available
+        String roleName = null;
+        try {
+            roleName = userRepository.findById(currentUserId)
+                .map(u -> u.getUserType() != null ? u.getUserType().getRoleName() : null)
+                .orElse(null);
+        } catch (Exception ignored) {
+        }
+
+        boolean isAdmin = false;
+        boolean isTechnician = false;
+        if (roleName != null) {
+            isAdmin = "admin".equalsIgnoreCase(roleName.trim());
+            isTechnician = "technician".equalsIgnoreCase(roleName.trim());
+        } else {
+            isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_ADMIN") || a.getAuthority().equalsIgnoreCase("ADMIN"));
+            isTechnician = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_TECHNICIAN") || a.getAuthority().equalsIgnoreCase("TECHNICIAN"));
+        }
+
+        TicketResponse response = ticketService.updateTicketStatus(id, request, currentUserId, isAdmin, isTechnician);
         return ResponseEntity.ok(response);
     }
 

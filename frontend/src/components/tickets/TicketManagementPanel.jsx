@@ -395,30 +395,10 @@ export default function TicketManagementPanel({ statusFilter, apiBaseUrl, token,
                           ));
                         }
 
-                        // Admin: show workflow transitions. Avoid duplicating the explicit 'Reject' button when ticket is OPEN
+                        // Admin: do not show technician workflow buttons (Start Progress / Resolve / Close).
+                        // Admin actions are handled above (Assign, explicit Reject) so render nothing here for admin.
                         if (role === "admin") {
-                          const adminAllowed = allowed.filter((ns) => {
-                            if (ticket.status === STATUSES.OPEN && ns === STATUSES.REJECTED) return false; // Reject already shown above for admins
-                            return true;
-                          });
-
-                          return adminAllowed.map((nextStatus) => (
-                            <button
-                              key={nextStatus}
-                              className={`book-by-name-clear ticket-action-btn-${(nextStatus || "").replace("_", "-").toLowerCase()}`}
-                              onClick={() =>
-                                setConfirmState({
-                                  ticketId: ticket.ticketId,
-                                  nextStatus,
-                                  title: `Confirm ${ACTION_LABELS[nextStatus]}?`,
-                                  message: `Are you sure you want to transition #${ticket.ticketId} to "${STATUS_LABELS[nextStatus]}"?`,
-                                })
-                              }
-                              type="button"
-                            >
-                              {ACTION_LABELS[nextStatus]}
-                            </button>
-                          ));
+                          return null;
                         }
 
                         return null;

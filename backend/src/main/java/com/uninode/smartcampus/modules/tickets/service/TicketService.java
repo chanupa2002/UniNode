@@ -177,27 +177,42 @@ public class TicketService {
         return tickets.map(this::mapToResponse);
     }
 
-    public TicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request, Long userId, boolean isAdmin) {
+    public TicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request, Long userId, boolean isAdmin, boolean isTechnician) {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new TicketNotFoundException(ticketId));
 
-        // Validate authorization - only admin or assigned technician
-        if (!isAdmin && (ticket.getAssignedUser() == null || !ticket.getAssignedUser().getUserId().equals(userId))) {
-            throw new TicketUnauthorizedException("Only assigned technician or admin can update ticket status");
+        TicketStatus desired = request.getStatus();
+
+        // Role-based authorization rules:
+        // - Reject: allowed for admin OR assigned technician
+        // - Start progress (IN_PROGRESS), Resolve (RESOLVED), Close (CLOSED): ONLY assigned technician
+        // - Other transitions follow the VALID_TRANSITIONS map but still must respect the above rules
+
+        if (desired == TicketStatus.REJECTED) {
+            if (!isAdmin && (ticket.getAssignedUser() == null || !ticket.getAssignedUser().getUserId().equals(userId))) {
+                throw new TicketUnauthorizedException("Only assigned technician or admin can reject a ticket");
+            }
+        } else if (desired == TicketStatus.IN_PROGRESS || desired == TicketStatus.RESOLVED || desired == TicketStatus.CLOSED) {
+            // Only assigned technician may perform these actions
+            if (!isTechnician || ticket.getAssignedUser() == null || !ticket.getAssignedUser().getUserId().equals(userId)) {
+                throw new TicketUnauthorizedException("Only the assigned technician can change ticket to the requested status");
+            }
+        } else {
+            // For other transitions (e.g., OPEN from REJECTED), fall through to transition validation
         }
 
-        // Validate status transition
+        // Validate status transition according to allowed transitions map
         Set<TicketStatus> validNextStatuses = VALID_TRANSITIONS.get(ticket.getStatus());
-        if (validNextStatuses == null || !validNextStatuses.contains(request.getStatus())) {
-            throw new InvalidStatusTransitionException(ticket.getStatus(), request.getStatus());
+        if (validNextStatuses == null || !validNextStatuses.contains(desired)) {
+            throw new InvalidStatusTransitionException(ticket.getStatus(), desired);
         }
 
         // If rejecting, store rejection reason in resolution notes
-        if (request.getStatus() == TicketStatus.REJECTED) {
+        if (desired == TicketStatus.REJECTED) {
             ticket.setResolutionNotes(request.getRejectionReason());
         }
 
-        ticket.setStatus(request.getStatus());
+        ticket.setStatus(desired);
         Ticket updatedTicket = ticketRepository.save(ticket);
         return mapToResponse(updatedTicket);
     }
