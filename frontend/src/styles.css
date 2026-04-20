@@ -4582,6 +4582,7 @@ input { outline: none; }
 }
 
 .raise-ticket-field input,
+.raise-ticket-select,
 .raise-ticket-textarea {
   width: 100%;
   min-height: 48px;
@@ -4595,10 +4596,25 @@ input { outline: none; }
   transition: all 180ms ease;
 }
 
+.raise-ticket-select {
+  min-height: 48px;
+}
+
+.raise-ticket-select option {
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
 :root[data-theme="dark"] .raise-ticket-field input,
+:root[data-theme="dark"] .raise-ticket-select,
 :root[data-theme="dark"] .raise-ticket-textarea {
   border-color: rgba(118, 144, 199, 0.2);
   background: rgba(13, 22, 40, 0.94);
+}
+
+:root[data-theme="dark"] .raise-ticket-select option {
+  background: #0d1628;
+  color: #eef3ff;
 }
 
 .raise-ticket-textarea {
