@@ -185,17 +185,23 @@ public class TicketService {
 
         // Role-based authorization rules:
         // - Reject: allowed for admin OR assigned technician
-        // - Start progress (IN_PROGRESS), Resolve (RESOLVED), Close (CLOSED): ONLY assigned technician
+        // - Start progress (IN_PROGRESS), Resolve (RESOLVED): ONLY assigned technician
+        // - Close (CLOSED): ONLY admin
         // - Other transitions follow the VALID_TRANSITIONS map but still must respect the above rules
 
         if (desired == TicketStatus.REJECTED) {
             if (!isAdmin && (ticket.getAssignedUser() == null || !ticket.getAssignedUser().getUserId().equals(userId))) {
                 throw new TicketUnauthorizedException("Only assigned technician or admin can reject a ticket");
             }
-        } else if (desired == TicketStatus.IN_PROGRESS || desired == TicketStatus.RESOLVED || desired == TicketStatus.CLOSED) {
-            // Only assigned technician may perform these actions
+        } else if (desired == TicketStatus.IN_PROGRESS || desired == TicketStatus.RESOLVED) {
+            // Only assigned technician may perform start-progress and resolve
             if (!isTechnician || ticket.getAssignedUser() == null || !ticket.getAssignedUser().getUserId().equals(userId)) {
                 throw new TicketUnauthorizedException("Only the assigned technician can change ticket to the requested status");
+            }
+        } else if (desired == TicketStatus.CLOSED) {
+            // Only admins may close tickets
+            if (!isAdmin) {
+                throw new TicketUnauthorizedException("Only an admin can close tickets");
             }
         } else {
             // For other transitions (e.g., OPEN from REJECTED), fall through to transition validation
