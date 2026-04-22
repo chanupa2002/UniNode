@@ -389,6 +389,7 @@ export default function TicketManagementPanel({ statusFilter, apiBaseUrl, token,
                         if (role === "technician") {
                           const techAllowed = allowed.filter((ns) => {
                             if (ns === STATUSES.REJECTED) return false; // technicians shouldn't have explicit Reject here
+                            if (ns === STATUSES.CLOSED) return false; // technicians may not close tickets
                             if (ticket.status === STATUSES.REJECTED && ns === STATUSES.OPEN) return false; // disallow Re-open for technicians
                             return true;
                           });
@@ -412,10 +413,26 @@ export default function TicketManagementPanel({ statusFilter, apiBaseUrl, token,
                           ));
                         }
 
-                        // Admin: do not show technician workflow buttons (Start Progress / Resolve / Close).
-                        // Admin actions are handled above (Assign, explicit Reject) so render nothing here for admin.
+                        // Admin: show Close action when applicable (admins already have Assign/Reject handled above)
                         if (role === "admin") {
-                          return null;
+                          const adminClose = allowed.filter(ns => ns === STATUSES.CLOSED);
+                          return adminClose.map((nextStatus) => (
+                            <button
+                              key={nextStatus}
+                              className={`book-by-name-clear ticket-action-btn-${(nextStatus || "").replace("_", "-").toLowerCase()}`}
+                              onClick={() =>
+                                setConfirmState({
+                                  ticketId: ticket.ticketId,
+                                  nextStatus,
+                                  title: `Confirm ${ACTION_LABELS[nextStatus]}?`,
+                                  message: `Are you sure you want to transition #${ticket.ticketId} to "${STATUS_LABELS[nextStatus]}"?`,
+                                })
+                              }
+                              type="button"
+                            >
+                              {ACTION_LABELS[nextStatus]}
+                            </button>
+                          ));
                         }
 
                         return null;
