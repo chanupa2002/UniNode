@@ -2805,6 +2805,23 @@ input { outline: none; }
 
 .settings-profile-shell {
   display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 18px;
+}
+
+.settings-profile-shell .workspace-header {
+  width: min(760px, 100%);
+  gap: 0;
+}
+
+.settings-profile-shell .workspace-title-block {
+  gap: 0;
+}
+
+.settings-profile-shell .workspace-title-block h2 {
+  font-size: 1.95rem;
+  line-height: 1.1;
 }
 
 .settings-profile-card {
